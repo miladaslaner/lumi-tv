@@ -17,6 +17,7 @@ updates:
       - dependency-name: "org.jetbrains.kotlinx:kotlinx-coroutines-*"
       - dependency-name: "org.jetbrains.kotlin.*"
       - dependency-name: "com.android.application"
+      - dependency-name: "gradle-wrapper"
   - package-ecosystem: github-actions
     directory: /
     schedule:
