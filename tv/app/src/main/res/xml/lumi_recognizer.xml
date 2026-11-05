@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lumi's recognizer is a stub required by the voice-interaction declaration: it must never be picked as the TV's
+     default speech recognizer by itself (e.g. after an install while no recognizer is set). The attribute exists from
+     Android 12; an Android 11 TV ignores it, and the stub refuses every request anyway (AssistEntry.kt). -->
+<recognition-service xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:selectableAsDefault="false"
+    tools:ignore="UnusedAttribute" />

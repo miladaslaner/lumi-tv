@@ -1,0 +1,16 @@
+{
+  "bg": "#08090a",
+  "panel": ["#0f1011", "#151617", "#1c1d1f"],
+  "border": "rgba(255,255,255,.08)",
+  "border_strong": "rgba(255,255,255,.12)",
+  "text": "#f7f8f8",
+  "text_secondary": "#d0d6e0",
+  "text_muted": "#8a8f98",
+  "green": "#4cb782",
+  "indigo": "#7170ff",
+  "font": "Inter",
+  "heading_weight": 560,
+  "heading_tracking": "-0.035em",
+  "radius_pill": 999,
+  "radius_card": 12
+}

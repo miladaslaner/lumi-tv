@@ -1,0 +1,5 @@
+.kotlin/
+# release signing (see app/build.gradle.kts): never committed
+*.jks
+*.keystore
+keystore.properties

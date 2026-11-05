@@ -1,0 +1,68 @@
+[project]
+name = "lumitv"
+version = "1.0.0"
+description = "Lumi TV server: family what-to-watch assistant (MCP)"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=2.3,<3",
+    "starlette",
+    "uvicorn",
+    "httpx",
+    "pydantic>=2",
+    "python-dotenv",
+    "websockets>=17.4",
+]
+
+[project.optional-dependencies]
+# speech-to-text on the server for questions spoken into the TV remote ([speech] engine = "faster-whisper")
+speech = ["faster-whisper>=1.1", "numpy"]
+
+[dependency-groups]
+# httpx2 is mcp's HTTP client; scripts/e2e_check.py uses it directly, so it is declared here
+dev = ["pytest", "pytest-asyncio", "respx", "numpy", "ruff", "pyright", "httpx2"]
+
+[project.scripts]
+lumitv = "lumitv.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lumitv"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+markers = ["kids_hours: keep the [kids] default_from/until rule (pass a clock)"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # the UI copy uses en dashes, ellipses and curly quotes on purpose
+    "SIM105", "SIM117",  # try/except/pass and nested `with` read fine here; contextlib.suppress adds nothing
+    "RUF005",  # `a + [b]` vs `[*a, b]`: no difference worth a rule
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]  # fixture data (JSON, URLs, log lines) is long on purpose
+
+[tool.ruff.lint.isort]
+known-first-party = ["lumitv"]
+combine-as-imports = true  # `from lumitv import config, services as services_mod` on one line, as the code is written
+
+[tool.ruff.format]
+# defaults (double quotes, trailing commas as written)
+
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+include = ["src"]

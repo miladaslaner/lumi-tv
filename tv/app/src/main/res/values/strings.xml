@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What Android shows for Lumi outside its own screens: the launcher row, the notification-listener entry in
+     Settings, the link's notification. Everything the family reads on screen comes from the server (strings.<lang>.json)
+     or the built-in defaults in ui/Theme.kt. -->
+<resources>
+    <string name="app_name">Lumi</string>
+    <string name="playback_watcher_label">Lumi playback state</string>
+    <string name="link_channel">Lumi link</string>
+</resources>

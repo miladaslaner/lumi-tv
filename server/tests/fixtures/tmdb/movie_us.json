@@ -1,0 +1,56 @@
+{
+ "id": 101,
+ "title": "Movie US",
+ "overview": "A film.",
+ "release_date": "2019-05-01",
+ "poster_path": "/p.jpg",
+ "runtime": 120,
+ "release_dates": {
+  "results": [
+   {
+    "iso_3166_1": "US",
+    "release_dates": [
+     {
+      "certification": "",
+      "type": 1
+     },
+     {
+      "certification": "PG-13",
+      "type": 3
+     }
+    ]
+   }
+  ]
+ },
+ "watch/providers": {
+  "results": {
+   "AE": {
+    "flatrate": [
+     {
+      "provider_id": 8
+     },
+     {
+      "provider_id": 119
+     }
+    ],
+    "rent": [
+     {
+      "provider_id": 2
+     }
+    ],
+    "buy": [
+     {
+      "provider_id": 3
+     }
+    ]
+   },
+   "NL": {
+    "rent": [
+     {
+      "provider_id": 2
+     }
+    ]
+   }
+  }
+ }
+}

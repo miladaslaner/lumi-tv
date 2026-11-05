@@ -1,0 +1,15 @@
+# Weekly update pull requests for the server's lock file, the TV app's Gradle dependencies and the CI actions.
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /server
+    schedule:
+      interval: weekly
+  - package-ecosystem: gradle
+    directory: /tv
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

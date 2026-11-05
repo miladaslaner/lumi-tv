@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The assistant entry (see AssistEntry.kt). Used only once the controller makes Lumi the TV's assistant. -->
+<voice-interaction-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sessionService="io.github.miladaslaner.lumitv.LumiSessionService"
+    android:recognitionService="io.github.miladaslaner.lumitv.LumiRecognitionService"
+    android:supportsAssist="true" />

@@ -1,0 +1,23 @@
+# Editor defaults for the repo; ruff (server) and the official Kotlin style (tv) agree with them.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{py,kt,kts}]
+max_line_length = 120
+
+[*.{json,yml,yaml,toml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Windows batch files keep CRLF (cmd.exe reads them line by line)
+[*.cmd]
+end_of_line = crlf

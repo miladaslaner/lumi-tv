@@ -1,0 +1,42 @@
+{
+ "id": 103,
+ "title": "Movie Bare",
+ "overview": "A film.",
+ "release_date": "2019-05-01",
+ "poster_path": null,
+ "runtime": 0,
+ "release_dates": {
+  "results": []
+ },
+ "watch/providers": {
+  "results": {
+   "AE": {
+    "flatrate": [
+     {
+      "provider_id": 8
+     },
+     {
+      "provider_id": 119
+     }
+    ],
+    "rent": [
+     {
+      "provider_id": 2
+     }
+    ],
+    "buy": [
+     {
+      "provider_id": 3
+     }
+    ]
+   },
+   "NL": {
+    "rent": [
+     {
+      "provider_id": 2
+     }
+    ]
+   }
+  }
+ }
+}

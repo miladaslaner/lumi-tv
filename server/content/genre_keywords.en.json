@@ -1,0 +1,7 @@
+{
+  "_comment": "Series only: TMDB has one Sci-Fi & Fantasy genre for series, so a series asked for under one of these names must also carry one of its TMDB keywords (OR). Films have separate genres and are not affected.",
+  "sci-fi": ["science fiction", "space", "alien", "future", "time travel", "artificial intelligence (a.i.)", "dystopia", "robot", "spaceship", "cyberpunk", "post-apocalyptic future", "space opera", "extraterrestrial technology", "parallel world"],
+  "scifi": ["science fiction", "space", "alien", "future", "time travel", "artificial intelligence (a.i.)", "dystopia", "robot", "spaceship", "cyberpunk", "post-apocalyptic future", "space opera", "extraterrestrial technology", "parallel world"],
+  "science fiction": ["science fiction", "space", "alien", "future", "time travel", "artificial intelligence (a.i.)", "dystopia", "robot", "spaceship", "cyberpunk", "post-apocalyptic future", "space opera", "extraterrestrial technology", "parallel world"],
+  "fantasy": ["magic", "dragon", "witch", "wizard", "sword and sorcery", "mythology", "fairy tale", "high fantasy", "vampire", "supernatural", "mythical creature", "sorcery"]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The server link is ws:// on the home LAN (Lumi is LAN-only). LAN IPs cannot be domain-scoped, so cleartext is
+     allowed for everything; the token still travels only in a header, never a URL. -->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
+</network-security-config>

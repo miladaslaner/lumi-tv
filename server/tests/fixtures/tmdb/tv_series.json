@@ -1,0 +1,28 @@
+{
+ "id": 200,
+ "name": "Series",
+ "overview": "A show.",
+ "first_air_date": "2020-01-01",
+ "poster_path": "/s.jpg",
+ "number_of_seasons": 2,
+ "number_of_episodes": 10,
+ "content_ratings": {
+  "results": [
+   {
+    "iso_3166_1": "NL",
+    "rating": "14"
+   }
+  ]
+ },
+ "watch/providers": {
+  "results": {
+   "NL": {
+    "flatrate": [
+     {
+      "provider_id": 72
+     }
+    ]
+   }
+  }
+ }
+}

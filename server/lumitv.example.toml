@@ -1,0 +1,262 @@
+[assistant]
+name = "Lumi"
+# the VPN's name in the TV's warnings ({vpn})
+vpn_name = "the VPN"
+
+[server]
+host = "0.0.0.0"
+port = 8765
+db_path = "lumitv.db"
+log_path = "logs/lumitv.jsonl"
+# TMDB requests in flight at once, every caller together; warming uses half of this. TMDB allows ~40 requests/s
+# (TMDB's figure). The cache is warmed daily at [cache] warm_at, and also at every start.
+lookup_concurrency = 16
+
+[answers]
+picks = 3
+candidates = 20  # titles looked up per search (at least picks)
+# with min_hours/max_hours most candidates fall outside the range (a 10-15 h binge keeps ~1 in 10), so look
+# at more; each costs a lookup on a cold cache (at least candidates)
+hours_candidates = 40
+
+[ranking]
+# TMDB genre ids a non-kids search drops (Animation, Kids, Family, Reality, Talk, Soap, News, Documentary) unless
+# a liked title or a requested genre has them
+off_genres_unless_liked = [16, 10762, 10751, 10764, 10767, 10766, 10763, 99]
+# genre and "like X" discovers only take titles with this many votes (0 = off); in kids mode kids_min_votes
+# applies instead, since children's titles get fewer votes
+min_votes = 300
+kids_min_votes = 50
+# "like" score: overlap_weight per liked title's similar list a candidate is in, plus bridged_weight when it came
+# from the genre-bridged discover, plus genre_weight x genre fit (0..1: how closely its genres match the liked
+# titles', relative to the best match of its kind); ties go to vote_average weighted by vote_count (Bayesian, bayes_*)
+overlap_weight = 2
+bridged_weight = 1
+genre_weight = 6.0
+bayes_min_votes = 200
+bayes_mean = 6.5
+# share of a "like" search's lookup pool kept for discover titles (those are on our services; TMDB similar
+# titles mostly aren't)
+discover_share = 0.75
+# once the titles' details are known, "like X" is ranked again: keyword_weight x the TMDB keywords a title shares
+# with X (rare keywords count more; mood words like "exciting" don't count), franchise_weight for a title named
+# like X ("Star Trek: Picard") that shares keywords with it, plus overlap_weight as above and final_genre_weight x
+# genre fit (keywords also count for less when the genres disagree)
+keyword_weight = 6.0
+franchise_weight = 3.0
+final_genre_weight = 2.0
+# a liked title is the most-voted of TMDB's first N search hits ("The Avengers" -> the 2012 film, not a 1961 series)
+liked_from_top = 3
+# titles never suggested, in any mode (kids too): "movie:<tmdb id>" or "tv:<tmdb id>" (movie and tv ids overlap).
+# For titles TMDB mis-tags, e.g. "tv:5371" (iCarly 2007, tagged Comedy only, so the Kids/Family filter can't see it)
+exclude_tmdb = []
+
+[language]
+code = "en"
+
+[cache]
+warm_at = "17:00"
+# genre names find_titles gets asked for often; warmed too so those searches are fast. Every warmed search is also
+# warmed in its kids-mode form (no age, and toddler); "like X" searches and other ages' cutoffs stay cold
+warm_genres = ["comedy", "animation", "family", "kids", "sci-fi", "action", "drama", "documentary"]
+
+[open]
+# user_agent_contact (first-time setup, required when a service opens exact titles): your email or a web page.
+# Wikidata refuses clients without a contact (its robot policy; no sign-up needed), and then picks open the app's
+# home screen instead of the title. Sent as "lumi-tv/<version> (<contact>) python-httpx/<version>".
+# `lumitv doctor` fails while it is empty.
+user_agent_contact = ""
+# wikidata_miss_ttl_days: a title without ids is looked up again after this long (new titles get their ids days
+# after release); found ids are kept wikidata_ttl_days.
+wikidata_ttl_days = 30
+wikidata_miss_ttl_days = 7
+# Google TV's own title page (title, rating, seasons and a "Watch in <app>" button that deep-links into the app at
+# that title), opened for picks of services with google_tv = true when the title's Google Knowledge Graph id is
+# known. The id comes from TMDB's external_ids (freebase_mid), else the title's Wikidata item (P2671 Google
+# Knowledge Graph ID, else P646 Freebase ID), and is cached. Checked on a Google TV (Android 14), 2026-11:
+# https://tv.google.com/asset/<URL-encoded id> opens the page; /entity/<id> gives "Loading error".
+google_tv_package = "com.google.android.apps.tv.launcherx"
+google_tv_url = "https://tv.google.com/asset/{google_id_url}"
+# find_titles starts looking up title ids (Google id, {netflix_id}) for its candidates; show_on_tv/open_title wait at
+# most this long for any still running, then send without the steps that need them
+title_id_wait_s = 0.25
+
+[ask]
+# Asking from the TV: the TV's mic button (or typing) sends the question to this server, which runs the Claude Code
+# CLI (`claude -p`, logged in with a Claude subscription; no API key) with only this server's MCP tools.
+# enabled = false: the TV's ask entry gets 503 "disabled"; Claude Desktop keeps working as before. Set it to false
+# if this server has no Claude Code: otherwise `lumitv doctor` fails and every start warns that it can't pre-warm.
+enabled = true
+# the Claude Code CLI: a name on PATH or a full path
+claude_path = "claude"
+model = "claude-haiku-5-5"
+# how hard Claude thinks before answering (claude --effort: low, medium, high, xhigh, max). "low" keeps TV asks quick;
+# "default" for the CLI's own default
+effort = "low"
+# an ask this many seconds after the previous one starts a new conversation (at least 60); sooner ones continue it,
+# so "something lighter" or "not that one" follow on
+new_conversation_after_s = 600
+# caps on asks; past them the TV says Lumi has reached its limit (HTTP 429): per_minute stops a runaway client on
+# the LAN, per_day keeps the Claude subscription for the evening (resets at local midnight; counted in memory: a
+# restart starts it over). An ask counts once it runs: a refused, repeated or cancelled-before-it-ran ask does not.
+per_minute = 6
+per_day = 150
+# one Claude run longer than this is stopped and the TV says it took too long; the TV reads it from hello.limits
+# (apps before 1.0.0 use 55 s)
+timeout_s = 45.0
+# longer questions are refused, and transcripts are cut to this (1..1000); the TV reads it from hello.limits (apps
+# before 1.0.0 use 200)
+max_question_chars = 200
+# Claude Code's working directory for TV asks (relative to where the server runs)
+workdir = "claude-home"
+# the MCP endpoint Claude is given; left out it is http://127.0.0.1:<server.port>/mcp
+# mcp_url = "http://127.0.0.1:8765/mcp"
+
+[speech]
+# Speech-to-text on this server for questions spoken into the TV remote (POST /ask/audio). The audio is held in
+# memory only, never written to disk or logged, and dropped once transcribed.
+# The TV is told in `hello` (`speech`) whether this server hears speech now: if so, a mic press sends the remote's
+# audio here; if not (engine = "none", or the model is not loaded: still loading after a start, or failed), the TV
+# uses its own speech recognizer instead, and is told again once the model is in.
+# engine = "none": the TV's /ask/audio gets 503 (it can still send text, e.g. from its own speech recognizer).
+# engine = "faster-whisper": needs the speech extra (`uv sync --extra speech`; every later `uv sync` needs it too,
+# or uv removes it). The model is kept loaded (no CPU while idle). Run scripts/bench_stt.py on this machine first: it
+# picks the model and downloads it into download_dir. A model not there yet is downloaded at startup; the load takes
+# 10-25 s on a busy PC, the download longer.
+engine = "none"
+model = "base.en"
+device = "cpu"
+compute_type = "int8"
+cpu_threads = 4
+beam_size = 1
+language = "en"
+# longer clips are refused; the TV reads it from hello.limits (apps before 1.0.0 use 15 s)
+max_audio_s = 15
+# one transcription longer than this is given up and the TV says it failed
+timeout_s = 10
+download_dir = "models"
+# spoken questions treated as nothing heard (Whisper's usual output on noise or silence): transcripts here and the
+# TV recognizer's text (source "voice"); compared ignoring case and punctuation. Typed questions are never dropped.
+ignore_phrases = ["thank you", "thanks for watching", "you"]
+
+[budgets]
+looking_ms = 1000
+posters_p50_ms = 8000
+followup_server_ms = 2000
+find_p95_cold_ms = 3000  # a cold "like X" search makes ~60 TMDB calls; measured ~3 s
+find_p95_warm_ms = 300
+render_ms = 500
+# asking from the TV: mic press -> listening on screen; end of speech -> "Looking for ..." on screen; end of
+# speech -> posters on screen (p50, and the p95 scripts/asks_report.py judges)
+listen_ms = 1000
+heard_ms = 3000
+ask_posters_p50_ms = 12000
+ask_posters_p95_ms = 15000
+
+[timeouts]
+tmdb_s = 3.0
+tv_ack_s = 5.0
+wikidata_s = 2.0
+
+[ratings]
+# a title's certificate is the strictest of the country's entries (cinema, DVD, TV); the fallback country's, mapped
+# below, replaces it when stricter (Love Actually: NL AL but US R -> 16). Labels without an age never pass kids mode
+country = "NL"
+fallback_country = "US"
+
+[ratings.fallback_map]
+G = "AL"
+TV-Y = "AL"
+TV-G = "AL"
+PG = "6"
+TV-Y7 = "6"
+TV-PG = "9"
+PG-13 = "12"
+TV-14 = "14"
+R = "16"
+NC-17 = "18"
+TV-MA = "18"
+
+[kids]
+order = ["AL", "6", "9", "12", "14", "16", "18"]
+# every label in order/toddler_allowed/no_age_max and every fallback_map value, with its minimum age; an unknown label is a config error
+ages = { AL = 0, "6" = 6, "9" = 9, "12" = 12, "14" = 14, "16" = 16, "18" = 18 }
+# an age above it counts as 15: 16+/18+ never in kids mode
+max_age = 15
+toddler_below_age = 6
+toddler_allowed = ["AL"]
+no_age_max = "6"
+# Between these local times kids mode is on unless someone says the answer is for grown-ups ("for us", "adults
+# only"): children may be watching. Outside them it is on only when asked. Remove both for "only when asked".
+default_from = "06:00"
+default_until = "19:00"
+
+# Example household: AE + NL catalogues, Videoland behind a VPN. Change region, services and kids hours to yours.
+[[services]]
+id = "netflix"
+label = "Netflix"
+region = "AE"
+tmdb_provider_ids = [8]
+package = "com.netflix.ninja"
+vpn = "off"
+# launch: how a pick opens in the app. action + data + extras become an Android intent for `package`; the plain
+# app launch is always the fallback, and nothing ever plays. Placeholders: {title}, {title_url} (URL-encoded),
+# {tmdb_id}, {year}, and {netflix_id} (Netflix's title id, from Wikidata P1874; when a title has none, this step
+# is left out). component = "package/.Activity" makes the intent explicit to that activity. No launch table =
+# just open the app.
+# relaunch_after_s: for apps that drop a link on a cold start (profile picker first), the TV sends the same launch
+# once, after the first of these seconds, if the app was not used in the last hour; not if something else came to the
+# front meanwhile. Later values are ignored by the TV (a second re-send could pull the user out of a video).
+# search_hint = true: the launch reaches the app's search screen but can't type the title, so the TV shows
+# 'Search for "<title>"' for a few seconds.
+# google_tv = true: try Google TV's title page first (see [open]); then the launch above, then the plain app.
+# Google TV's page lists the providers of Google TV's own country/account, which may differ from your catalogue
+# region; enable it only for services that page offers (checked: Prime yes; Netflix no on a TV whose Google TV
+# country differs from the Netflix catalogue region). In Google TV's settings, add your apps under "Your services" so the page's button says
+# Watch instead of Subscribe.
+# Checked on a Google TV (Android 14), 2026-11: TMDB has no Netflix/Prime/Videoland title ids, and each app shows
+# its profile picker first on a cold start.
+# Netflix: no public link opens its search (https://www.netflix.com/search?q= does not resolve, nflx:// lands on
+# home), but a title link opens the exact title page when Netflix is already running with a profile. From a cold
+# start Netflix shows its profile picker and drops the link, hence relaunch_after_s.
+launch = { action = "android.intent.action.VIEW", data = "https://www.netflix.com/title/{netflix_id}", component = "com.netflix.ninja/.MainActivity", extras = { source = "30" } }
+relaunch_after_s = [10]
+google_tv = false
+
+[[services]]
+id = "prime"
+label = "Prime Video"
+region = "AE"
+tmdb_provider_ids = [119]
+package = "com.amazon.amazonvideo.livingroom"
+vpn = "any"
+# Prime Video: this link reaches the search screen (after the profile picker); the phrase is not filled in.
+launch = { action = "android.intent.action.VIEW", data = "https://app.primevideo.com/search?phrase={title_url}" }
+search_hint = true
+# Google TV's page for a Prime title shows an "amazon prime" button that opens Prime at the title (checked).
+google_tv = true
+
+[[services]]
+id = "videoland"
+label = "Videoland"
+region = "NL"
+tmdb_provider_ids = [72]
+package = "nl.rtl.videoland.v2"
+vpn = "on"
+# Videoland: the SEARCH intent and videoland-v2:// links land on home; this link reaches the (empty) search
+# screen after the profile picker. No query parameter fills it in.
+launch = { action = "android.intent.action.VIEW", data = "https://v2.videoland.com/zoeken" }
+search_hint = true
+# not checked yet whether Google TV's page offers Videoland
+google_tv = false
+
+[[services]]
+id = "youtube"
+label = "YouTube"
+region = ""
+tmdb_provider_ids = []
+package = "com.google.android.youtube.tv"
+vpn = "any"
+# YouTube: not checked on the TV (it has no TMDB source, so it never yields picks).
+launch = { action = "android.intent.action.VIEW", data = "https://www.youtube.com/results?search_query={title_url}" }
+google_tv = false
