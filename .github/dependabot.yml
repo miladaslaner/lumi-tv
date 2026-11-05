@@ -9,6 +9,14 @@ updates:
     directory: /tv
     schedule:
       interval: weekly
+    # The Android toolchain moves as one deliberate change (Kotlin, its compose plugin, AGP, then the libraries that
+    # need the newer Kotlin), checked on a real TV: no automatic major bumps, and no coroutines bumps (they track Kotlin).
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "org.jetbrains.kotlinx:kotlinx-coroutines-*"
+      - dependency-name: "org.jetbrains.kotlin.*"
+      - dependency-name: "com.android.application"
   - package-ecosystem: github-actions
     directory: /
     schedule:
